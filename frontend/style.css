@@ -130,6 +130,105 @@ button {
 .page-tab.paddle.ocr     { border-color: #16a085; background: #e8f8f5; }
 .page-tab.active.paddle  { background: #16a085; color: #fff; }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0;
+}
+.tab-btn {
+  padding: 0.5rem 1.4rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: -2px;
+}
+.tab-btn:hover  { color: #333; }
+.tab-btn.active { color: #4a90e2; border-bottom-color: #4a90e2; font-weight: 600; }
+
+/* Batch actions row */
+.batch-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+#batch-btn {
+  background: #4a90e2;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.65rem 2rem;
+}
+#batch-btn:disabled { opacity: 0.45; cursor: default; }
+#batch-btn:not(:disabled):hover { background: #357abd; }
+
+#csv-btn {
+  background: #27ae60;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.4rem;
+}
+#csv-btn:hover { background: #219150; }
+
+/* Batch summary line */
+.batch-summary {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Batch results table */
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+#batch-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+#batch-table th {
+  background: #f0f0f0;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid #ddd;
+}
+#batch-table td {
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.filename-cell { max-width: 180px; color: #444; }
+.row-ok   { background: #f6fff8; }
+.row-error { background: #fff6f6; }
+.row-extra td:nth-child(-n+3) { border: none; }
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-processing { background: #fff8e1; color: #7a5f00; }
+.badge-ok         { background: #e8f5e9; color: #2e7d32; }
+.badge-error      { background: #fdecea; color: #b71c1c; }
+
 /* Output */
 .output {
   background: #fff;

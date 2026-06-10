@@ -43,5 +43,35 @@ async def convert(
     }
 
 
+@app.post("/api/batch")
+async def batch_convert(
+    files: list[UploadFile] = File(...),
+    ocr_lang: str = Form("eng"),
+):
+    results = []
+    for file in files:
+        if not file.filename.lower().endswith(".pdf"):
+            results.append({"filename": file.filename, "error": "Not a PDF file"})
+            continue
+
+        pdf_bytes = await file.read()
+        if len(pdf_bytes) == 0:
+            results.append({"filename": file.filename, "error": "Empty file"})
+            continue
+
+        try:
+            result = convert_pdf_to_text(pdf_bytes, ocr_lang=ocr_lang)
+            results.append({
+                "filename": file.filename,
+                "page_count": result["page_count"],
+                "text": result["text"],
+                "parsed": parse_form(result["text"]),
+            })
+        except Exception as exc:
+            results.append({"filename": file.filename, "error": str(exc)})
+
+    return results
+
+
 # Mount static files AFTER API routes so the catch-all doesn't swallow POST /api/convert
 app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
