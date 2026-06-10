@@ -1,0 +1,10 @@
+# Optional: PaddleOCR for superior CJK (Chinese/Japanese/Korean) OCR quality.
+# Install one of the following depending on your hardware:
+#
+#   CPU:  pip install paddlepaddle paddleocr
+#   GPU:  pip install paddlepaddle-gpu paddleocr
+#
+# Without this, the app falls back to Tesseract for all scripts.
+
+paddlepaddle
+paddleocr

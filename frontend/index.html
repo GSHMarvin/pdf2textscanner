@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF to Text Scanner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>PDF to Text Scanner</h1>
+    <p class="subtitle">Upload a PDF to extract its text. Scanned pages are handled automatically via OCR.</p>
+
+    <div id="drop-zone" class="drop-zone">
+      <span id="drop-label">Drag &amp; drop a PDF here, or click to browse</span>
+      <input type="file" id="file-input" accept=".pdf" hidden />
+    </div>
+
+    <div class="options-row">
+      <label for="lang-select">OCR language:</label>
+      <select id="lang-select">
+        <option value="eng">English</option>
+        <option value="chi_tra">Chinese (Traditional)</option>
+        <option value="chi_sim">Chinese (Simplified)</option>
+        <option value="eng+chi_tra">English + Chinese (Traditional)</option>
+        <option value="jpn">Japanese</option>
+        <option value="kor">Korean</option>
+      </select>
+    </div>
+
+    <button id="convert-btn" disabled>Convert</button>
+
+    <div id="status" class="status hidden"></div>
+
+    <div id="result-section" class="result-section hidden">
+      <div class="result-header">
+        <span id="result-meta"></span>
+        <button id="copy-btn">Copy text</button>
+        <button id="download-btn">Download .txt</button>
+      </div>
+      <div id="page-tabs" class="page-tabs"></div>
+      <pre id="output" class="output"></pre>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
