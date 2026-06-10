@@ -130,6 +130,73 @@ button {
 .page-tab.paddle.ocr     { border-color: #16a085; background: #e8f8f5; }
 .page-tab.active.paddle  { background: #16a085; color: #fff; }
 
+/* Signature correction panel */
+.signatures-section {
+  margin-top: 1.25rem;
+  border: 1px solid #d0e8ff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background: #f7fbff;
+}
+.sig-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c5f8a;
+}
+.sig-hint {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: #888;
+}
+.sig-grid {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.sig-grid label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #444;
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+.sig-role {
+  font-size: 0.72rem;
+  color: #888;
+  font-weight: 400;
+}
+.sig-grid input[type="text"] {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #c0d8f0;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  background: #fff;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.sig-grid input[type="text"]:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+.sig-grid input[type="text"]:not(:placeholder-shown) {
+  border-color: #90c4a8;
+  background: #f6fff9;
+}
+#download-json-btn {
+  background: #4a90e2;
+  color: #fff;
+  font-size: 0.88rem;
+  padding: 0.5rem 1.2rem;
+}
+#download-json-btn:hover { background: #357abd; }
+
 /* Tabs */
 .tabs {
   display: flex;

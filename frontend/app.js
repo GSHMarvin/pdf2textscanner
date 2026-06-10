@@ -23,6 +23,15 @@ const pageTabs    = document.getElementById("page-tabs");
 const output      = document.getElementById("output");
 const copyBtn     = document.getElementById("copy-btn");
 const downloadBtn = document.getElementById("download-btn");
+const sigSection  = document.getElementById("signatures-section");
+const sigInputs   = {
+  warehouse_mgr: document.getElementById("sig-warehouse"),
+  materials_mgr: document.getElementById("sig-materials"),
+  qc:            document.getElementById("sig-qc"),
+  unit_mgr:      document.getElementById("sig-unit"),
+  applicant:     document.getElementById("sig-applicant"),
+};
+const downloadJsonBtn = document.getElementById("download-json-btn");
 
 let selectedFile = null;
 let lastResult   = null;
@@ -94,6 +103,17 @@ function renderResult(data) {
   data.pages.forEach((p) => pageTabs.appendChild(makeTab({ label: `P${p.number}`, page: p, text: p.text })));
   output.textContent = data.text || "(no text extracted)";
   resultSection.classList.remove("hidden");
+
+  // Signature correction panel — show only for recognised forms
+  if (data.parsed?.signatures) {
+    const sigs = data.parsed.signatures;
+    for (const [key, input] of Object.entries(sigInputs)) {
+      input.value = sigs[key] || "";
+    }
+    sigSection.classList.remove("hidden");
+  } else {
+    sigSection.classList.add("hidden");
+  }
 }
 
 function makeTab({ label, page, text }) {
@@ -133,6 +153,21 @@ downloadBtn.addEventListener("click", () => {
   if (!lastResult) return;
   const baseName = lastResult.filename.replace(/\.pdf$/i, "");
   triggerDownload(new Blob([output.textContent], { type: "text/plain" }), `${baseName}.txt`);
+});
+
+downloadJsonBtn.addEventListener("click", () => {
+  if (!lastResult) return;
+  const corrected = {
+    ...lastResult.parsed,
+    signatures: Object.fromEntries(
+      Object.entries(sigInputs).map(([key, input]) => [key, input.value.trim() || null])
+    ),
+  };
+  const baseName = lastResult.filename.replace(/\.pdf$/i, "");
+  triggerDownload(
+    new Blob([JSON.stringify(corrected, null, 2)], { type: "application/json" }),
+    `${baseName}.json`
+  );
 });
 
 // ══════════════════════════════════════════════════════════════════════════════

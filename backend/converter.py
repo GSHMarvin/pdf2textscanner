@@ -164,7 +164,7 @@ def _get_paddle(lang: str) -> Any:
 
 
 _PADDLE_MAX_SIDE = 960  # pixels — matches PaddleOCR det model's internal default; 1600 causes OOM on CPU
-_PADDLE_SCORE_THRESH = 0.75  # drop low-confidence detections (garbled logo fragments etc.)
+_PADDLE_SCORE_THRESH = 0.50  # logo zone filter handles the top-left; keep threshold low enough for stamps/signatures
 # Fraction of image width/height that defines the top-left logo exclusion zone.
 # Boxes that fall entirely within this corner are suppressed regardless of score,
 # because company logos in that region read as real words (e.g. "Health").
@@ -181,9 +181,23 @@ def _resize_for_paddle(img: Image.Image) -> Image.Image:
     return img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
 
 
+def _enhance_ink(img: Image.Image) -> Image.Image:
+    """
+    Convert to grayscale using the per-pixel channel minimum instead of luma.
+    Standard luma makes red ink ~75% gray (low contrast); min-channel maps any
+    colored ink (red stamps, blue signatures) to a dark value against white paper.
+    Returns an RGB image with all three channels set to the minimum value so both
+    PaddleOCR and Tesseract receive a compatible array shape.
+    """
+    import numpy as np
+    arr = np.array(img.convert("RGB"))
+    gray = np.min(arr, axis=2, keepdims=True)          # (H, W, 1)
+    return Image.fromarray(np.repeat(gray, 3, axis=2).astype(np.uint8))
+
+
 def _ocr_paddle(img: Image.Image, lang: str) -> str:
     import numpy as np
-    arr = np.array(_resize_for_paddle(img))
+    arr = np.array(_resize_for_paddle(_enhance_ink(img)))
     ih, iw = arr.shape[:2]
     logo_x = iw * _LOGO_ZONE_X
     logo_y = ih * _LOGO_ZONE_Y
@@ -209,7 +223,7 @@ def _ocr_paddle(img: Image.Image, lang: str) -> str:
 
 
 def _ocr_tesseract(img: Image.Image, lang: str) -> str:
-    return pytesseract.image_to_string(img, lang=lang).strip()
+    return pytesseract.image_to_string(_enhance_ink(img), lang=lang).strip()
 
 
 def _ocr_auto(

@@ -49,6 +49,30 @@
         <div id="page-tabs" class="page-tabs"></div>
         <pre id="output" class="output"></pre>
       </div>
+
+      <div id="signatures-section" class="signatures-section hidden">
+        <div class="sig-header">
+          <span>Signature Approvals</span>
+          <small class="sig-hint">OCR pre-filled where possible — correct as needed</small>
+        </div>
+        <div class="sig-grid">
+          <label>倉管 <span class="sig-role">Warehouse Mgr</span></label>
+          <input type="text" id="sig-warehouse" placeholder="—" />
+
+          <label>資材主管 <span class="sig-role">Materials Mgr</span></label>
+          <input type="text" id="sig-materials" placeholder="—" />
+
+          <label>品管 <span class="sig-role">QC</span></label>
+          <input type="text" id="sig-qc" placeholder="—" />
+
+          <label>單位主管 <span class="sig-role">Unit Supervisor</span></label>
+          <input type="text" id="sig-unit" placeholder="—" />
+
+          <label>申請人 <span class="sig-role">Applicant</span></label>
+          <input type="text" id="sig-applicant" placeholder="—" />
+        </div>
+        <button id="download-json-btn">Download corrected JSON</button>
+      </div>
     </div>
 
     <!-- ── Batch Tab ── -->

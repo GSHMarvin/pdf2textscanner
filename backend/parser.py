@@ -98,6 +98,55 @@ def _parse_item(segment: str, seq: str, category: str, post_anchor: str = "") ->
     return item
 
 
+_SIG_LABEL_WORDS = {"單位主管", "資材主管", "資材部主管", "品管", "申請人", "倉管", "管", "本"}
+
+
+def _clean_sig(val: str) -> str | None:
+    """Strip noise chars; return None if the value looks like a label, date, or number."""
+    val = val.strip().rstrip("]）)】>：:")
+    if not val or len(val) < 2:
+        return None
+    # Reject dates/numbers/punctuation-only
+    if re.match(r'^[\d>.\-/:%\s]+$', val):
+        return None
+    # Reject if the value is itself a known label word
+    if val in _SIG_LABEL_WORDS:
+        return None
+    return val
+
+
+def _extract_signatures(text: str) -> dict:
+    """
+    Best-effort extraction of approval signatures from the bottom section.
+    Returns a dict with five keys; value is None when OCR couldn't reliably read it.
+    The correction UI lets users fill in or fix these values.
+    """
+    sigs: dict = {
+        "warehouse_mgr": None,   # 倉管
+        "materials_mgr": None,   # 資材主管
+        "qc":            None,   # 品管
+        "unit_mgr":      None,   # 單位主管
+        "applicant":     None,   # 申請人
+    }
+
+    # Only match inline (same line): use [ \t]* not \s* to avoid crossing newlines
+    inline = [
+        ("applicant",     r"申請人[：:][ \t]*([^\n：:【】\[\]]{2,10})"),
+        ("unit_mgr",      r"單位主管[：:][ \t]*([^\n：:【】\[\]]{2,10})"),
+        ("qc",            r"品管[：:][ \t]*([^\n：:【】\[\]]{2,10})"),
+        ("materials_mgr", r"資材部?主管[：:][ \t]*([^\n：:【】\[\]]{2,10})"),
+        ("warehouse_mgr", r"倉管[：:][ \t]*([^\n：:【】\[\]]{2,10})"),
+    ]
+    for key, pat in inline:
+        m = re.search(pat, text)
+        if m:
+            val = _clean_sig(m.group(1))
+            if val:
+                sigs[key] = val
+
+    return sigs
+
+
 def parse_f01009(text: str) -> dict | None:
     """
     Parse F01009 生產入(出)庫單 fields from OCR text.
@@ -143,6 +192,10 @@ def parse_f01009(text: str) -> dict | None:
     m = re.search(r"(?<![QqM])(M[O0]-[\d>]+)", text)
     if m:
         result["mo_no"] = _fix_num(m.group(1)).replace("M0-", "MO-")
+
+    # --- Signatures (best-effort from handwriting/stamp OCR) ---
+    sig_text = text[text.find("以下空白"):] if "以下空白" in text else text
+    result["signatures"] = _extract_signatures(sig_text)
 
     # --- Line items ---
     anchor_re = re.compile(rf"(\d{{4}})({_CATEGORIES})")
