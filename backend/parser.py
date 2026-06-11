@@ -10,8 +10,9 @@ import re
 
 
 def _fix_num(s: str) -> str:
-    """Fix common OCR digit substitutions: > → 2, O → 0, ( → 1."""
-    return s.replace(">", "2").replace("O", "0").replace("(", "1").replace("（", "1")
+    """Fix common OCR digit substitutions: > → 2, O → 0, ( → 1, △/▷ → 4."""
+    return (s.replace(">", "2").replace("O", "0").replace("(", "1").replace("（", "1")
+             .replace("△", "4").replace("▷", "4").replace("▶", "4"))
 
 
 # ---------------------------------------------------------------------------
@@ -51,7 +52,13 @@ def _parse_item(segment: str, seq: str, category: str, post_anchor: str = "") ->
     cat_char = re.escape(category[0])
     m = re.search(rf"({cat_char}[^\n]{{4,}})", segment)
     if m:
-        item["name"] = m.group(1).strip()
+        name = m.group(1).strip()
+        # Strip category prefix that bled in from the adjacent table column
+        if name.startswith(category):
+            name = name[len(category):].lstrip()
+        elif name.startswith(category[0]) and len(name) > 1 and name[1].isascii():
+            name = name[1:].lstrip()
+        item["name"] = name or None
 
     # Warehouse: 高登X倉/仓/食
     m = re.search(r"(高登[^\s，,。\n]{1,5}[倉仓食])", segment)
@@ -183,10 +190,10 @@ def parse_f01009(text: str) -> dict | None:
     if m:
         result["date"] = m.group(1)
 
-    # Inspection number QMO-…
-    m = re.search(r"(QM[O0]-[\d>()（）]+)", text)
+    # Inspection number QMO-…  (△/▷ are common OCR misreads for 4)
+    m = re.search(r"(QM[O0]-[\d>()（）△▷▶]+)", text)
     if m:
-        result["inspection_no"] = _fix_num(m.group(1))
+        result["inspection_no"] = _fix_num(m.group(1)).replace("QM0-", "QMO-")
 
     # Manufacturing order MO-… (not preceded by Q)
     m = re.search(r"(?<![QqM])(M[O0]-[\d>]+)", text)
